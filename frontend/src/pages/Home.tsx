@@ -1,7 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
-
-
 const KRAKOW: [number, number] = [50.0647, 19.945];
 
 export const Home = () => {

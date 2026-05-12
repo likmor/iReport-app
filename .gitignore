@@ -26,3 +26,4 @@ dist-ssr
 obj
 bin
 appsettings.Development.json
+.env

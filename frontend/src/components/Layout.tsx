@@ -31,7 +31,7 @@ export default function Layout() {
                 )}
               </NavLink>
             ))}
-            <Button variant="filled"  c="dark" onClick={() => navigate("/login")}>
+            <Button variant="filled" c="dark" onClick={() => navigate("/login")}>
               Login
             </Button>
           </Group>
