@@ -1,11 +1,22 @@
-import { TextInput, PasswordInput, Button, Paper, Title, Text, Anchor, Alert, ActionIcon } from "@mantine/core";
+import {
+  TextInput,
+  PasswordInput,
+  Button,
+  Paper,
+  Title,
+  Text,
+  Anchor,
+  Alert,
+  ActionIcon,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useRegister } from "../services/authService";
+import { useAuthStore } from "@/store/authStore";
 
 export default function RegisterPage() {
   const { mutate: register, isPending, error } = useRegister();
-
+  const { isLoggedIn } = useAuthStore();
   const form = useForm({
     initialValues: { fullName: "", email: "", password: "", confirmPassword: "" },
     validate: {
@@ -15,14 +26,26 @@ export default function RegisterPage() {
       confirmPassword: (v, values) => (v !== values.password ? "Passwords do not match" : null),
     },
   });
+  if (isLoggedIn) return <Navigate to="/" />;
 
   return (
-    <div style={{ height: "calc(100vh - 60px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div
+      style={{
+        height: "calc(100vh - 60px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <Paper withBorder shadow="md" p="xl" radius="md" w={420}>
-        <Title order={2} mb={4}>Create an account</Title>
+        <Title order={2} mb={4}>
+          Create an account
+        </Title>
         <Text c="dimmed" size="sm" mb="xl">
           Already have an account?{" "}
-          <Anchor component={Link} to="/login" size="sm">Sign in</Anchor>
+          <Anchor component={Link} to="/login" size="sm">
+            Sign in
+          </Anchor>
         </Text>
 
         {error && (

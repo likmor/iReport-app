@@ -2,15 +2,17 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { AppShell, Group, Button, Text, Burger, Drawer, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useAuthStore } from "@/store/authStore";
 
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
-  { label: "Reports", to: "/reports" },
+  { label: "Reports", to: "/my-reports" },
 ];
 
 export default function Layout() {
   const [opened, { toggle, close }] = useDisclosure(false);
+  const { isLoggedIn,fullName } = useAuthStore();
   const navigate = useNavigate();
 
   return (
@@ -31,16 +33,28 @@ export default function Layout() {
                 )}
               </NavLink>
             ))}
-            <Button variant="filled" c="dark" onClick={() => navigate("/login")}>
-              Login
-            </Button>
+            {!isLoggedIn ? (
+              <Button
+                variant="filled"
+                color="lime"
+                c="dark"
+                onClick={() => {
+                  navigate("/login");
+                  close();
+                }}
+              >
+                Login
+              </Button>
+            ) : (
+              <Text>Logged in {fullName}</Text>
+            )}
           </Group>
 
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" />
         </Group>
       </AppShell.Header>
 
-      <Drawer opened={opened} onClose={close} title="Menu" hiddenFrom="sm">
+      <Drawer opened={opened} onClose={close} title="Menu" hiddenFrom="sm" zIndex={1000}>
         <Stack>
           {navLinks.map((link) => (
             <NavLink key={link.to} to={link.to} onClick={close}>
@@ -51,17 +65,21 @@ export default function Layout() {
               )}
             </NavLink>
           ))}
-          <Button
-            variant="filled"
-            color="lime"
-            c="dark"
-            onClick={() => {
-              navigate("/login");
-              close();
-            }}
-          >
-            Login
-          </Button>
+          {!isLoggedIn ? (
+            <Button
+              variant="filled"
+              color="lime"
+              c="dark"
+              onClick={() => {
+                navigate("/login");
+                close();
+              }}
+            >
+              Login
+            </Button>
+          ) : (
+            <Text>Logged in  {fullName}</Text>
+          )}
         </Stack>
       </Drawer>
 
