@@ -13,7 +13,15 @@ namespace backend
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
-
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("Dev", policy =>
+				{
+					policy.WithOrigins("http://localhost:5173")
+						  .AllowAnyHeader()
+						  .AllowAnyMethod();
+				});
+			});
 			// Add services to the container.
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
@@ -43,6 +51,7 @@ namespace backend
 
 			var app = builder.Build();
 
+			app.UseCors("Dev");
 			app.UseAuthentication();
 			app.UseAuthorization();
 
@@ -54,9 +63,6 @@ namespace backend
 			}
 
 			app.UseHttpsRedirection();
-
-			app.UseAuthorization();
-
 
 			app.MapControllers();
 
