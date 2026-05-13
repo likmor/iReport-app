@@ -35,7 +35,9 @@ namespace backend
 						 ValidIssuer = builder.Configuration["Jwt:Issuer"],
 						 ValidAudience = builder.Configuration["Jwt:Audience"],
 						 IssuerSigningKey = new SymmetricSecurityKey(
-							 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
+							 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
+						 //RoleClaimType = "role",
+
 					 };
 				 });
 
@@ -51,6 +53,7 @@ namespace backend
 
 			var app = builder.Build();
 
+			app.UseHttpsRedirection();
 			app.UseCors("Dev");
 			app.UseAuthentication();
 			app.UseAuthorization();
@@ -62,7 +65,6 @@ namespace backend
 				app.UseSwaggerUI();
 			}
 
-			app.UseHttpsRedirection();
 
 			app.MapControllers();
 

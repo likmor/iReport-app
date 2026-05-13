@@ -1,5 +1,4 @@
 using backend.Services;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using RegisterRequest = backend.Application.DTOs.RegisterRequest;
 using LoginRequest = backend.Application.DTOs.LoginRequest;
