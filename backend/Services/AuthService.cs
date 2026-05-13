@@ -41,7 +41,8 @@ namespace backend.Services
 			{
 				Email = request.Email,
 				FullName = request.FullName,
-				PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
+				PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+				Role = UserRole.User
 			};
 
 			_db.Users.Add(user);
