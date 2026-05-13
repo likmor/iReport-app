@@ -112,5 +112,21 @@ namespace backend.Controllers
 
 			return NoContent();
 		}
+
+		[Authorize(Roles = "Admin, Official")]
+		[HttpPatch("{id}/status")]
+		public async Task<IActionResult> ChangeStatus(int id, [FromBody] ChangeStatusDto dto)
+		{
+			var report = await _db.Reports.FindAsync(id);
+
+			if (report == null)
+				return NotFound();
+
+			report.Status = dto.Status;
+
+			await _db.SaveChangesAsync();
+
+			return Ok();
+		}
 	}
 }

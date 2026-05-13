@@ -12,6 +12,7 @@ import {
   Avatar,
 } from "@mantine/core";
 import { useAdminUsers, useChangeRole } from "../services/adminService";
+import type { Roles } from "@/types/auth";
 
 const ROLE_COLORS: Record<string, string> = {
   Citizen: "gray",
@@ -85,7 +86,7 @@ export default function AdminPanel() {
                     size="xs"
                     w={120}
                     value={user.role}
-                    data={["Citizen", "Official", "Admin"]}
+                    data={["User", "Official", "Admin"] as Roles[]}
                     onChange={(role) => role && changeRole({ id: user.id, role })}
                   />
                 </Table.Td>

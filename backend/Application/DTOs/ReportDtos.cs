@@ -1,4 +1,6 @@
-﻿namespace backend.Application.DTOs
+﻿using backend.Domain.Entities;
+
+namespace backend.Application.DTOs
 {
 	public record CategoryDto(int Id, string Name, string Icon);
 	public record CreateReportDto(
@@ -22,4 +24,5 @@
 		string CreatedAt,
 		Boolean Removable
 	);
+	public record ChangeStatusDto(ReportStatus Status);
 }

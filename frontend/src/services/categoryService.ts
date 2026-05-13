@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "./api";
+import type { Category } from "@/types/report";
 
-export interface Category { id: number; name: string; }
 
 export const useCategories = () =>
   useQuery<Category[]>({

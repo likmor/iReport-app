@@ -22,17 +22,13 @@ import { FunnelIcon, PlusIcon } from "@phosphor-icons/react";
 import { CreateReportModal } from "@/components/CreateReportModal";
 import { CategoryIcon } from "@/utils/categoryIcons";
 import { useReports } from "@/services/reportService";
-import type { Report } from "@/types/report";
-import { useCategories, type Category } from "@/services/categoryService";
+import type { Category, Report } from "@/types/report";
+import { useCategories } from "@/services/categoryService";
+import { STATUS_COLORS } from "@/utils/statusIcons";
+import { createCategoryMarkerIcon } from "@/utils/markerIcon";
 
 const KRAKOW: [number, number] = [50.0647, 19.945];
 
-const STATUS_COLORS: Record<string, string> = {
-  New: "blue",
-  InProgress: "yellow",
-  Resolved: "lime",
-  Rejected: "red",
-};
 
 const MapFlyTo = ({ position }: { position: [number, number] | null }) => {
   const map = useMap();
@@ -249,6 +245,7 @@ export const Home = () => {
             <Marker
               key={report.id}
               position={[report.latitude, report.longitude]}
+              icon={createCategoryMarkerIcon(report.category.icon, report.status)}
               eventHandlers={{
                 click: () => {
                   handleReportClick(report, false);

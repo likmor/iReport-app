@@ -17,13 +17,7 @@ import { useState } from "react";
 import { ReportModal } from "../components/ReportModal";
 import { CalendarIcon, EyeIcon, MapPinIcon, TagIcon } from "@phosphor-icons/react";
 import { CategoryIcon } from "@/utils/categoryIcons";
-
-const STATUS_COLORS: Record<string, string> = {
-  New: "blue",
-  InProgress: "yellow",
-  Resolved: "green",
-  Rejected: "red",
-};
+import { STATUS_COLORS } from "@/utils/statusIcons";
 
 export default function MyReportsPage() {
   const { data: reports, isLoading, isError } = useMyReports();
