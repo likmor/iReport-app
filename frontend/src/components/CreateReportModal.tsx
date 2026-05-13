@@ -75,26 +75,16 @@ export const CreateReportModal = ({ opened, onClose, initialLat, initialLng }: P
     );
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title="Submit a Report"
-      size="lg"
-      radius="md"
-    
-    >
+    <Modal opened={opened} onClose={onClose} title="Submit a Report" size="lg" radius="md" centered>
       <form onSubmit={handleSubmit}>
         <Stack>
-          <TextInput
-            label="Title"
-            placeholder="Title"
-            {...form.getInputProps("title")}
-          />
+          <TextInput label="Title" placeholder="Title" required {...form.getInputProps("title")}/>
 
           <Textarea
             label="Description"
             placeholder="Description"
             minRows={3}
+            required
             {...form.getInputProps("description")}
           />
 
@@ -102,6 +92,7 @@ export const CreateReportModal = ({ opened, onClose, initialLat, initialLng }: P
             label="Category"
             placeholder="Select category"
             data={categories?.map((c) => ({ value: String(c.id), label: c.name })) ?? []}
+            required
             {...form.getInputProps("categoryId")}
           />
           <FileInput
@@ -133,7 +124,10 @@ export const CreateReportModal = ({ opened, onClose, initialLat, initialLng }: P
             )}
             <div style={{ height: 220, borderRadius: 8, overflow: "hidden" }}>
               <MapContainer center={KRAKOW} zoom={13} style={{ height: "100%", width: "100%" }}>
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
                 <LocationPicker onPick={(lat, lng) => setPosition([lat, lng])} />
                 {position && <Marker position={position} />}
               </MapContainer>

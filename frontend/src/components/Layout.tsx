@@ -1,18 +1,18 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
-import { AppShell, Group, Button, Text, Burger, Drawer, Stack } from "@mantine/core";
+import { AppShell, Group, Button, Text, Burger, Drawer, Stack, Menu, Avatar } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAuthStore } from "@/store/authStore";
 
 const navLinks = [
   { label: "Home", to: "/" },
-  { label: "About", to: "/about" },
-  { label: "Reports", to: "/my-reports" },
+  { label: "My Reports", to: "/my-reports" },
+  { label: "Admin Panel", to: "/admin", role: "Admin" },
 ];
 
 export default function Layout() {
   const [opened, { toggle, close }] = useDisclosure(false);
-  const { isLoggedIn,fullName } = useAuthStore();
+  const { isLoggedIn, fullName, email, role, logout } = useAuthStore();
   const navigate = useNavigate();
 
   return (
@@ -24,15 +24,23 @@ export default function Layout() {
           </Text>
 
           <Group gap="xs" visibleFrom="sm">
-            {navLinks.map((link) => (
-              <NavLink key={link.to} to={link.to}>
-                {({ isActive }) => (
-                  <Button variant={isActive ? "light" : "subtle"} color="dark" size="sm">
-                    {link.label}
-                  </Button>
-                )}
-              </NavLink>
-            ))}
+            {navLinks
+              .filter((link) => !link.role || link.role === role)
+              .map((link) => (
+                <NavLink key={link.to} to={link.to}>
+                  {({ isActive }) => (
+                    <Button
+                      variant={isActive ? "filled" : "subtle"}
+                      color="lime"
+                      c="dark"
+                      size="sm"
+                    >
+                      {link.label}
+                    </Button>
+                  )}
+                </NavLink>
+              ))}
+
             {!isLoggedIn ? (
               <Button
                 variant="filled"
@@ -46,7 +54,32 @@ export default function Layout() {
                 Login
               </Button>
             ) : (
-              <Text>Logged in {fullName}</Text>
+              <Menu shadow="md" width={180}>
+                <Menu.Target>
+                  <Button variant="subtle" c="dark" color="lime">
+                    <Group>
+                      <Avatar color="lime" radius="xl" size="sm">
+                        {fullName?.charAt(0).toUpperCase()}
+                      </Avatar>
+                      {fullName}
+                    </Group>
+                  </Button>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  <Menu.Label>{email}</Menu.Label>
+                  <Menu.Label>Role: {role}</Menu.Label>
+                  <Menu.Item
+                    color="red"
+                    onClick={() => {
+                      logout();
+                      navigate("/login");
+                    }}
+                  >
+                    Logout
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             )}
           </Group>
 
@@ -54,17 +87,19 @@ export default function Layout() {
         </Group>
       </AppShell.Header>
 
-      <Drawer opened={opened} onClose={close} title="Menu" hiddenFrom="sm" zIndex={1000}>
+      <Drawer opened={opened} onClose={close} title="Menu" hiddenFrom="sm">
         <Stack>
-          {navLinks.map((link) => (
-            <NavLink key={link.to} to={link.to} onClick={close}>
-              {({ isActive }) => (
-                <Button variant={isActive ? "light" : "subtle"} color="dark" fullWidth>
-                  {link.label}
-                </Button>
-              )}
-            </NavLink>
-          ))}
+          {navLinks
+            .filter((link) => !link.role || link.role === role)
+            .map((link) => (
+              <NavLink key={link.to} to={link.to} onClick={close}>
+                {({ isActive }) => (
+                  <Button variant={isActive ? "filled" : "subtle"} color="lime" c="dark" fullWidth>
+                    {link.label}
+                  </Button>
+                )}
+              </NavLink>
+            ))}
           {!isLoggedIn ? (
             <Button
               variant="filled"
@@ -78,7 +113,32 @@ export default function Layout() {
               Login
             </Button>
           ) : (
-            <Text>Logged in  {fullName}</Text>
+            <Menu shadow="md" width={180}>
+              <Menu.Target>
+                <Button variant="subtle" c="dark" color="lime">
+                  <Group>
+                    <Avatar color="lime" radius="xl" size="sm">
+                      {fullName?.charAt(0).toUpperCase()}
+                    </Avatar>
+                    {fullName}
+                  </Group>
+                </Button>
+              </Menu.Target>
+
+              <Menu.Dropdown>
+                <Menu.Label>{email}</Menu.Label>
+                <Menu.Label>Role: {role}</Menu.Label>
+                <Menu.Item
+                  color="red"
+                  onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}
+                >
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           )}
         </Stack>
       </Drawer>

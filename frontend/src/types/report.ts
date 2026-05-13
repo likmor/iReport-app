@@ -13,6 +13,7 @@ export interface Report {
   latitude: number;
   longitude: number;
   createdAt: string;
+  removable: boolean;
 }
 
 export interface CreateReportRequest {
@@ -21,4 +22,8 @@ export interface CreateReportRequest {
   categoryId: number;
   latitude: number;
   longitude: number;
+}
+
+export interface DeleteReportRequest {
+  id: number;
 }

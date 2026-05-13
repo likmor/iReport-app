@@ -67,9 +67,9 @@ export default function LoginPage() {
             mb="xs"
             {...form.getInputProps("password")}
           />
-          <Anchor size="xs" style={{ display: "block", textAlign: "right" }} mb="xl">
+          {/* <Anchor size="xs" style={{ display: "block", textAlign: "right" }} mb="xl">
             Forgot password?
-          </Anchor>
+          </Anchor> */}
           <Button type="submit" fullWidth color="lime" c="dark" loading={isPending}>
             Sign In
           </Button>

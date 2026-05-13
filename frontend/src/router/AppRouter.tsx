@@ -5,6 +5,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import LoginPage from "@/pages/Login";
 import RegisterPage from "@/pages/Register";
 import MyReportsPage from "@/pages/MyReports";
+import AdminPanel from "@/pages/AdminPanel";
 
 export const AppRouter = () => (
   <Routes>
@@ -15,6 +16,9 @@ export const AppRouter = () => (
 
       <Route element={<ProtectedRoute roles={["User", "Admin"]} />}>
         <Route path="my-reports" element={<MyReportsPage />} />
+      </Route>
+      <Route element={<ProtectedRoute roles={["Admin"]} />}>
+        <Route path="admin" element={<AdminPanel />} />
       </Route>
     </Route>
   </Routes>

@@ -11,7 +11,6 @@ import {
   Divider,
   Box,
   Drawer,
-  ActionIcon,
   Button,
   Center,
   Loader,
@@ -19,7 +18,7 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useState, useEffect } from "react";
 import { ReportModal } from "@/components/ReportModal";
-import { FunnelIcon, MagnifyingGlassIcon, PlusIcon } from "@phosphor-icons/react";
+import { FunnelIcon, PlusIcon } from "@phosphor-icons/react";
 import { CreateReportModal } from "@/components/CreateReportModal";
 import { CategoryIcon } from "@/utils/categoryIcons";
 import { useReports } from "@/services/reportService";
@@ -118,10 +117,10 @@ const SidebarContent = ({
             style={{ cursor: "pointer",boxShadow: "0 1px 6px rgba(0,0,0,0.2)" }}
           >
             <Group justify="space-between" mb={4}>
-              <Text size="sm" fw={600} lineClamp={1}>
+              <Text size="sm" fw={600} lineClamp={1} style={{ flex: 1, minWidth: 0 }}>
                 {report.title}
               </Text>
-              <Badge color={STATUS_COLORS[report.status]} size="xs" variant="outline">
+              <Badge color={STATUS_COLORS[report.status]} size="xs" variant="outline" style={{flexShrink: 0}}>
                 {report.status}
               </Badge>
             </Group>
@@ -207,7 +206,7 @@ export const Home = () => {
           <SidebarContent {...sidebarProps} />
         )}
       </Box>
-      <Box style={{ position: "absolute", bottom: 24, right: 24, zIndex: 1000 }} hiddenFrom="sm">
+      <Box style={{ position: "absolute", bottom: 24, right: 24, zIndex: 101 }} hiddenFrom="sm">
         <Button
           leftSection={<PlusIcon size={16} />}
           color="lime"
@@ -218,7 +217,7 @@ export const Home = () => {
           Report Problem
         </Button>
       </Box>
-      <Box hiddenFrom="sm" style={{ position: "absolute", top: 12, left: 60, zIndex: 1000 }}>
+      <Box hiddenFrom="sm" style={{ position: "absolute", top: 12, left: 60, zIndex: 101 }}>
         <Button
           leftSection={<FunnelIcon size={18} />}
           color="lime"
