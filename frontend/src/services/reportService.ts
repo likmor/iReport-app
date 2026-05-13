@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
-import type { CreateReportRequest, DeleteReportRequest, Report } from "../types/report";
+import type {
+  CreateReportRequest,
+  DeleteReportRequest,
+  Report,
+  UpdateStatusReportRequest,
+} from "../types/report";
 
 export const useMyReports = () =>
   useQuery<Report[]>({
@@ -37,6 +42,20 @@ export const useDeleteReport = () => {
           data,
         })
         .then((r) => r.data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reports"] });
+      queryClient.invalidateQueries({ queryKey: ["my-reports"] });
+    },
+  });
+};
+
+export const useUpdateStatusReport = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: UpdateStatusReportRequest) =>
+      api.patch(`/api/reports/${data.id}/status`, {status: data.newStatus}).then((r) => r.data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports"] });

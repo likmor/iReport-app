@@ -14,3 +14,5 @@ export interface AuthResponse {
   refreshToken: string;
   role: string;
 }
+
+export type Roles = "User" | "Official" | "Admin";

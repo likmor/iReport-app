@@ -8,30 +8,46 @@ import {
   Image,
   SimpleGrid,
   Button,
+  Select,
 } from "@mantine/core";
-import type { Report } from "@/types/report";
+import type { Report, ReportStatus } from "@/types/report";
 import { CategoryIcon } from "@/utils/categoryIcons";
 import { MapPinIcon } from "@phosphor-icons/react";
 import { modals } from "@mantine/modals";
-import { useDeleteReport } from "@/services/reportService";
+import { useDeleteReport, useUpdateStatusReport } from "@/services/reportService";
 import { useAuthStore } from "@/store/authStore";
-const STATUS_COLORS: Record<string, string> = {
-  New: "blue",
-  InProgress: "yellow",
-  Resolved: "green",
-  Rejected: "red",
-};
+import { STATUS_COLORS } from "@/utils/statusIcons";
+import { useEffect, useState } from "react";
 
 interface ReportModalProps {
   report: Report | null;
   opened: boolean;
   onClose: () => void;
 }
-
 export const ReportModal = ({ report, opened, onClose }: ReportModalProps) => {
-    const {role} = useAuthStore();
+  const { role } = useAuthStore();
   const { mutate: deleteReport, isPending } = useDeleteReport();
+  const { mutate: changeStatus, isPending: isStatusPending } = useUpdateStatusReport();
+  const [currentStatus, setCurrentStatus] = useState<ReportStatus | undefined>(report?.status);
+
+  useEffect(() => {
+    setCurrentStatus(report?.status);
+  }, [report?.status]);
+
+  const canEditStatus = role === "Admin" || role === "Official";
+  const canDelete = report?.removable || canEditStatus;
+
   if (!report) return null;
+  const onStatusSelect = (value: ReportStatus | null) => {
+    if (!value) return;
+    setCurrentStatus(value);
+    changeStatus(
+      { id: report.id, newStatus: value },
+      {
+        onError: () => setCurrentStatus(report.status),
+      }
+    );
+  };
 
   return (
     <Modal
@@ -47,11 +63,19 @@ export const ReportModal = ({ report, opened, onClose }: ReportModalProps) => {
       centered
     >
       <Stack gap="md">
-        <Group>
+        {canEditStatus ? (
+          <Select
+            loading={isStatusPending}
+            label="Status"
+            data={Object.keys(STATUS_COLORS)}
+            value={currentStatus}
+            onChange={(value) => onStatusSelect(value as ReportStatus | null)}
+          />
+        ) : (
           <Badge color={STATUS_COLORS[report.status]} variant="outline" size="md">
             {report.status}
           </Badge>
-        </Group>
+        )}
 
         <Divider />
 
@@ -97,7 +121,7 @@ export const ReportModal = ({ report, opened, onClose }: ReportModalProps) => {
             />
           </SimpleGrid>
         </div>
-        {(report.removable || role == "Admin") && (
+        {canDelete && (
           <Button
             variant="light"
             color="red"

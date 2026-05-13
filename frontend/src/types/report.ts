@@ -3,13 +3,14 @@ export interface Category {
   name: string;
   icon: string;
 }
+export type ReportStatus = "New" | "InProgress" | "Resolved" | "Rejected";
 
 export interface Report {
   id: number;
   title: string;
   description: string;
   category: Category;
-  status: string;
+  status: ReportStatus;
   latitude: number;
   longitude: number;
   createdAt: string;
@@ -26,4 +27,9 @@ export interface CreateReportRequest {
 
 export interface DeleteReportRequest {
   id: number;
+}
+
+export interface UpdateStatusReportRequest {
+  id: number;
+  newStatus: string;
 }

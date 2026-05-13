@@ -5,7 +5,7 @@ import { useCategories } from "../services/categoryService";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { useState } from "react";
 import { useAuthStore } from "../store/authStore";
-
+import { createCategoryMarkerIcon } from "@/utils/markerIcon";
 const KRAKOW: [number, number] = [50.0647, 19.945];
 
 const LocationPicker = ({ onPick }: { onPick: (lat: number, lng: number) => void }) => {
@@ -38,6 +38,7 @@ export const CreateReportModal = ({ opened, onClose, initialLat, initialLng }: P
       categoryId: (v) => (!v ? "Select a category" : null),
     },
   });
+  const selectedCategory = categories?.find((c) => String(c.id) === form.values.categoryId);
 
   const handleSubmit = form.onSubmit((values) => {
     if (!position) return;
@@ -78,7 +79,7 @@ export const CreateReportModal = ({ opened, onClose, initialLat, initialLng }: P
     <Modal opened={opened} onClose={onClose} title="Submit a Report" size="lg" radius="md" centered>
       <form onSubmit={handleSubmit}>
         <Stack>
-          <TextInput label="Title" placeholder="Title" required {...form.getInputProps("title")}/>
+          <TextInput label="Title" placeholder="Title" required {...form.getInputProps("title")} />
 
           <Textarea
             label="Description"
@@ -129,7 +130,12 @@ export const CreateReportModal = ({ opened, onClose, initialLat, initialLng }: P
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <LocationPicker onPick={(lat, lng) => setPosition([lat, lng])} />
-                {position && <Marker position={position} />}
+                {position && (
+                  <Marker
+                    position={position}
+                    icon={createCategoryMarkerIcon(selectedCategory?.icon ?? "", "New")}
+                  />
+                )}
               </MapContainer>
             </div>
             {!position && (
