@@ -27,6 +27,14 @@ namespace backend.Infrastructure
 				.WithMany()
 				.HasForeignKey(r => r.AssignedOfficialId)
 				.OnDelete(DeleteBehavior.SetNull);
+
+			builder.Entity<Category>().HasData(
+				new Category { Id = 1, Name = "Road", Icon = "road" },
+				new Category { Id = 2, Name = "Lighting", Icon = "bulb" },
+				new Category { Id = 3, Name = "Garbage", Icon = "trash" },
+				new Category { Id = 4, Name = "Vandalism", Icon = "spray" },
+				new Category { Id = 5, Name = "Other", Icon = "question-mark" }
+			);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Infrastructure;
@@ -11,9 +12,11 @@ using backend.Infrastructure;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513140606_AddReportTitle")]
+    partial class AddReportTitle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,38 +44,6 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Icon = "road",
-                            Name = "Road"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Icon = "bulb",
-                            Name = "Lighting"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Icon = "trash",
-                            Name = "Garbage"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Icon = "spray",
-                            Name = "Vandalism"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Icon = "question-mark",
-                            Name = "Other"
-                        });
                 });
 
             modelBuilder.Entity("backend.Domain.Entities.RefreshToken", b =>
@@ -204,7 +175,7 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("backend.Domain.Entities.Category", "Category")
-                        .WithMany()
+                        .WithMany("Reports")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -220,6 +191,11 @@ namespace backend.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("backend.Domain.Entities.User", b =>

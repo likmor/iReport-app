@@ -1,8 +1,10 @@
-﻿using backend.Infrastructure;
+﻿using backend.Application.DTOs;
+using backend.Domain.Entities;
+using backend.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace backend.Controllers
 {
@@ -29,6 +31,46 @@ namespace backend.Controllers
 				.ToListAsync();
 
 			return Ok(reports);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetAll()
+		{
+			var reports = await _db.Reports
+				.Include(r => r.Category)
+				.OrderByDescending(r => r.CreatedAt)
+				.Select(r => new ReportDto(
+					r.Id, r.Title, r.Description,
+					new CategoryDto(r.Category.Id, r.Category.Name, r.Category.Icon),
+					r.Status.ToString(),
+					r.Latitude, r.Longitude,
+					r.CreatedAt.ToString("o")))
+				.ToListAsync();
+
+			return Ok(reports);
+		}
+
+		[Authorize]
+		[HttpPost]
+		public async Task<IActionResult> Create(CreateReportRequest request)
+		{
+			var userId = int.Parse(User.FindFirstValue("id")!);
+
+			var report = new Report
+			{
+				Title = request.Title,
+				Description = request.Description,
+				CategoryId = request.CategoryId,
+				Latitude = request.Latitude,
+				Longitude = request.Longitude,
+				UserId = userId,
+				Status= ReportStatus.New,
+			};
+
+			_db.Reports.Add(report);
+			await _db.SaveChangesAsync();
+
+			return Ok(report.Id);
 		}
 	}
 }
