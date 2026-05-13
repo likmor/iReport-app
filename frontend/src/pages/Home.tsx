@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import {
   Stack,
   Text,
@@ -10,74 +10,30 @@ import {
   Group,
   Divider,
   Box,
-  Burger,
   Drawer,
   ActionIcon,
+  Button,
+  Center,
+  Loader,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState, useEffect } from "react";
-import { point } from "leaflet";
 import { ReportModal } from "@/components/ReportModal";
-import { MagnifyingGlassIcon } from "@phosphor-icons/react";
+import { FunnelIcon, MagnifyingGlassIcon, PlusIcon } from "@phosphor-icons/react";
+import { CreateReportModal } from "@/components/CreateReportModal";
+import { CategoryIcon } from "@/utils/categoryIcons";
+import { useReports } from "@/services/reportService";
+import type { Report } from "@/types/report";
+import { useCategories, type Category } from "@/services/categoryService";
 
 const KRAKOW: [number, number] = [50.0647, 19.945];
 
 const STATUS_COLORS: Record<string, string> = {
   New: "blue",
   InProgress: "yellow",
-  Resolved: "green",
+  Resolved: "lime",
   Rejected: "red",
 };
-
-const CATEGORIES = ["Road", "Lighting", "Garbage", "Vandalism", "Other"];
-
-const MOCK_REPORTS = [
-  {
-    id: 1,
-    title: "Pothole on Floriańska",
-    category: "Road",
-    status: "New",
-    lat: 50.0647,
-    lng: 19.945,
-    description: "Large pothole causing damage to vehicles.",
-  },
-  {
-    id: 2,
-    title: "Broken streetlight",
-    category: "Lighting",
-    status: "InProgress",
-    lat: 50.062,
-    lng: 19.94,
-    description: "Streetlight has been out for 2 weeks.",
-  },
-  {
-    id: 3,
-    title: "Illegal dumping",
-    category: "Garbage",
-    status: "Resolved",
-    lat: 50.067,
-    lng: 19.95,
-    description: "Garbage left near the park entrance.",
-  },
-  {
-    id: 4,
-    title: "Graffiti on wall",
-    category: "Vandalism",
-    status: "Rejected",
-    lat: 50.063,
-    lng: 19.948,
-    description: "Spray paint on public building.",
-  },
-  {
-    id: 5,
-    title: "Road crack",
-    category: "Road",
-    status: "New",
-    lat: 50.066,
-    lng: 19.942,
-    description: "Crack running across the bike lane.",
-  },
-];
 
 const MapFlyTo = ({ position }: { position: [number, number] | null }) => {
   const map = useMap();
@@ -89,30 +45,43 @@ const MapFlyTo = ({ position }: { position: [number, number] | null }) => {
 
 const SidebarContent = ({
   filtered,
+  categories,
   selectedCategories,
   setSelectedCategories,
   selectedStatus,
   setSelectedStatus,
   onReportClick,
+  onCreateClick,
   selectedId,
 }: {
-  filtered: typeof MOCK_REPORTS;
+  filtered: Report[];
+  categories: Category[];
   selectedCategories: string[];
   setSelectedCategories: (v: string[]) => void;
   selectedStatus: string | null;
   setSelectedStatus: (v: string | null) => void;
-  onReportClick: (report: (typeof MOCK_REPORTS)[0]) => void;
+  onReportClick: (report: Report) => void;
+  onCreateClick: () => void;
   selectedId: number | null;
 }) => (
   <Stack h="100%" gap={0}>
     <Stack p="md" gap="sm">
+      <Button
+        leftSection={<PlusIcon size={16} />}
+        color="lime"
+        c="dark"
+        fullWidth
+        onClick={onCreateClick}
+      >
+        Report a Problem
+      </Button>
       <Text fw={700} size="sm">
         Filters
       </Text>
       <MultiSelect
         label="Category"
         placeholder="All categories"
-        data={CATEGORIES}
+        data={categories.map((el) => el.name)}
         value={selectedCategories}
         onChange={setSelectedCategories}
         clearable
@@ -146,20 +115,20 @@ const SidebarContent = ({
             padding="sm"
             radius="md"
             onClick={() => onReportClick(report)}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer",boxShadow: "0 1px 6px rgba(0,0,0,0.2)" }}
           >
             <Group justify="space-between" mb={4}>
               <Text size="sm" fw={600} lineClamp={1}>
                 {report.title}
               </Text>
-              <Badge color={STATUS_COLORS[report.status]} size="xs" variant="light">
+              <Badge color={STATUS_COLORS[report.status]} size="xs" variant="outline">
                 {report.status}
               </Badge>
             </Group>
             <Group gap={4} mb={4}>
-              <ActionIcon size={12} color="gray" />
+              <CategoryIcon name={report.category.icon} size={16}></CategoryIcon>
               <Text size="xs" c="dimmed">
-                {report.category}
+                {report.category.name}
               </Text>
             </Group>
             <Text size="xs" c="dimmed" lineClamp={2}>
@@ -179,20 +148,28 @@ export const Home = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
-  const [selectedReport, setSelectedReport] = useState<(typeof MOCK_REPORTS)[0] | null>(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
-  const filtered = MOCK_REPORTS.filter((r) => {
-    const matchCategory =
-      selectedCategories.length === 0 || selectedCategories.includes(r.category);
-    const matchStatus = !selectedStatus || r.status === selectedStatus;
-    return matchCategory && matchStatus;
-  });
+  const { data: categories, isLoading: isCategoriesLoading } = useCategories();
 
-  const handleReportClick = (report: (typeof MOCK_REPORTS)[0], flyTo = true) => {
+  const { data: reports, isLoading: isReportsLoading } = useReports();
+
+  const isLoading = isCategoriesLoading || isReportsLoading;
+
+  const filtered =
+    reports?.filter((r) => {
+      const matchCategory =
+        selectedCategories.length === 0 || selectedCategories.includes(r.category.name);
+      const matchStatus = !selectedStatus || r.status === selectedStatus;
+      return matchCategory && matchStatus;
+    }) ?? [];
+
+  const handleReportClick = (report: Report, flyTo = true) => {
     setSelectedReport(report);
     setSelectedId(report.id);
     if (flyTo) {
-      setFlyTo([report.lat, report.lng]);
+      setFlyTo([report.latitude, report.longitude]);
       setTimeout(() => openModal(), 400);
     } else {
       openModal();
@@ -202,11 +179,13 @@ export const Home = () => {
 
   const sidebarProps = {
     filtered,
+    categories: categories ?? [],
     selectedCategories,
     setSelectedCategories,
     selectedStatus,
     setSelectedStatus,
     onReportClick: handleReportClick,
+    onCreateClick: openCreate,
     selectedId,
   };
 
@@ -220,26 +199,38 @@ export const Home = () => {
         }}
         visibleFrom="sm"
       >
-        <SidebarContent {...sidebarProps} />
+        {isLoading ? (
+          <Center h="calc(100vh - 60px)">
+            <Loader color="lime" />
+          </Center>
+        ) : (
+          <SidebarContent {...sidebarProps} />
+        )}
       </Box>
-
-      <Box hiddenFrom="sm" style={{ position: "absolute", top: 12, left: 60, zIndex: 2000 }}>
-        <ActionIcon
-          onClick={open}
-          variant="gradient"
+      <Box style={{ position: "absolute", bottom: 24, right: 24, zIndex: 1000 }} hiddenFrom="sm">
+        <Button
+          leftSection={<PlusIcon size={16} />}
+          color="lime"
+          c="dark"
+          onClick={openCreate}
+          style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}
         >
-          <MagnifyingGlassIcon  style={{ width: "70%", height: "70%" }} />
-        </ActionIcon>
+          Report Problem
+        </Button>
+      </Box>
+      <Box hiddenFrom="sm" style={{ position: "absolute", top: 12, left: 60, zIndex: 1000 }}>
+        <Button
+          leftSection={<FunnelIcon size={18} />}
+          color="lime"
+          c="dark"
+          onClick={open}
+          style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.2)" }}
+        >
+          Filter
+        </Button>
       </Box>
 
-      <Drawer
-        opened={opened}
-        onClose={close}
-        title="Reports"
-        hiddenFrom="sm"
-        zIndex={1000}
-        padding={0}
-      >
+      <Drawer opened={opened} onClose={close} hiddenFrom="sm" title="Reports">
         <SidebarContent {...sidebarProps} />
       </Drawer>
 
@@ -258,7 +249,7 @@ export const Home = () => {
           {filtered.map((report) => (
             <Marker
               key={report.id}
-              position={[report.lat, report.lng]}
+              position={[report.latitude, report.longitude]}
               eventHandlers={{
                 click: () => {
                   handleReportClick(report, false);
@@ -281,6 +272,7 @@ export const Home = () => {
         </MapContainer>
       </Box>
       <ReportModal report={selectedReport} opened={modalOpened} onClose={closeModal} />
+      <CreateReportModal opened={createOpened} onClose={closeCreate} />
     </div>
   );
 };

@@ -1,21 +1,13 @@
 import { Modal, Text, Badge, Group, Stack, Divider, Image, SimpleGrid, CheckIcon } from "@mantine/core";
-
+import type { Report } from "@/types/report";
+import { CategoryIcon } from "@/utils/categoryIcons";
+import { MapPinIcon } from "@phosphor-icons/react";
 const STATUS_COLORS: Record<string, string> = {
   New: "blue",
   InProgress: "yellow",
   Resolved: "green",
   Rejected: "red",
 };
-
-interface Report {
-  id: number;
-  title: string;
-  category: string;
-  status: string;
-  description: string;
-  lat: number;
-  lng: number;
-}
 
 interface ReportModalProps {
   report: Report | null;
@@ -45,15 +37,15 @@ export const ReportModal = ({ report, opened, onClose }: ReportModalProps) => {
         <Divider />
 
         <Group gap="xs">
-          <CheckIcon size={16} color="gray" />
+          <CategoryIcon name={report.category.icon} size={16}/>
           <Text size="sm" c="dimmed">Category</Text>
-          <Text size="sm" fw={500}>{report.category}</Text>
+          <Text size="sm" fw={500}>{report.category.name}</Text>
         </Group>
 
         <Group gap="xs">
-          <CheckIcon size={16} color="gray" />
+          <MapPinIcon  size={16} color="gray" />
           <Text size="sm" c="dimmed">Location</Text>
-          <Text size="sm" fw={500}>{report.lat.toFixed(4)}, {report.lng.toFixed(4)}</Text>
+          <Text size="sm" fw={500}>{report.latitude.toFixed(4)}, {report.longitude.toFixed(4)}</Text>
         </Group>
 
         <Divider />
@@ -66,7 +58,7 @@ export const ReportModal = ({ report, opened, onClose }: ReportModalProps) => {
         <div>
           <Text size="sm" c="dimmed" mb={8}>Photos</Text>
           <SimpleGrid cols={3}>
-            <Image radius="sm" h={80} src={null} fallbackSrc="https://placehold.co/120x80?text=No+photo" />
+            <Image radius="sm" h={120} src={null} fallbackSrc="https://placehold.co/600x400?text=No+photo" />
           </SimpleGrid>
         </div>
       </Stack>
