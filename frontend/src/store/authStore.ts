@@ -13,10 +13,10 @@ interface AuthState {
   isLoggedIn: boolean;
   role: string | null;
   fullName: string | null;
+  email: string | null;
   login: (accessToken: string, refreshToken: string) => void;
   logout: () => void;
 }
-
 
 const token = localStorage.getItem("accessToken");
 const decoded = token ? jwtDecode<JwtPayload>(token) : null;
@@ -25,6 +25,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: !!token,
   role: decoded?.role ?? null,
   fullName: decoded?.fullName ?? null,
+  email: decoded?.email ?? null,
 
   login: (accessToken, refreshToken) => {
     const payload = jwtDecode<JwtPayload>(accessToken);

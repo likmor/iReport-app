@@ -77,11 +77,6 @@ export default function MyReportsPage() {
                   <Badge color={STATUS_COLORS[report.status]} size="xs" variant="light">
                     {report.status}
                   </Badge>
-                  <Tooltip label="View details">
-                    <ActionIcon variant="subtle" size="sm" color="gray">
-                      <EyeIcon size={14} />
-                    </ActionIcon>
-                  </Tooltip>
                 </Group>
               </Group>
 
