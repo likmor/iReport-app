@@ -1,14 +1,16 @@
 ﻿namespace backend.Application.DTOs
 {
 	public record CategoryDto(int Id, string Name, string Icon);
-	public record CreateReportRequest(
+	public record CreateReportDto(
 		string Title,
 		string Description,
 		int CategoryId,
 		double Latitude,
 		double Longitude
 	);
-
+	public record DeleteReportDto(
+		int Id
+	);
 	public record ReportDto(
 		int Id,
 		string Title,
@@ -17,6 +19,7 @@
 		string Status,
 		double Latitude,
 		double Longitude,
-		string CreatedAt
+		string CreatedAt,
+		Boolean Removable
 	);
 }
